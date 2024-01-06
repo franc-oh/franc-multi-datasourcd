@@ -19,7 +19,7 @@ spring:
     hikari:
       connection-test-query: SELECT 1
       minimum-idle: 10
-      maximum-pool-size: 50
+      maximum-pool-size: 20
       pool-name: pool-tester
 
   jackson:
@@ -37,5 +37,6 @@ jasypt:
       prefix: ENC(
       suffix: )
 
-
+logging:
+  config: classpath:log4j2.xml
 
