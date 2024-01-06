@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.franc.dao.maria2.M2TestDao">
+
+    <select id="selectEmpById" parameterType="Long" resultType="com.franc.vo.maria2.EmpVO">
+        /** TestMapper.selectEmpById */
+        select a.*
+        from emp a
+        where a.empno = #{empno}
+    </select>
+
+    <select id="selectEmpList" resultType="com.franc.vo.maria2.EmpVO">
+        /** TestMapper.selectEmpList */
+        select a.*
+        from emp a
+    </select>
+
+</mapper>

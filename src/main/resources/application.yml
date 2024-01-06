@@ -1,0 +1,41 @@
+server:
+  port: 8090
+  servlet:
+      context-path: /franc
+      encoding:
+        charset: UTF-8
+        enabled: true
+        force: true
+  tomcat:
+    uri-encoding: UTF-8
+
+
+spring:
+  output:
+    ansi:
+      enabled: always
+
+  datasource:
+    hikari:
+      connection-test-query: SELECT 1
+      minimum-idle: 10
+      maximum-pool-size: 50
+      pool-name: pool-tester
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    property:
+      prefix: ENC(
+      suffix: )
+
+
+

@@ -1,0 +1,28 @@
+server:
+  port: 8091
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  config:
+    activate:
+      on-profile: "test"
+
+  datasource:
+    postgres:
+      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      jdbc-url: jdbc:log4jdbc:postgresql://127.0.0.1:5432/francdb
+      username: ENC(6Sj4bxwpxoaNPMBMakuxJNfHE46Wjecs)
+      password: ENC(9el1u2eJwVVwm+9LqqJ00bXQXHQ83eH5)
+
+    maria1:
+      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      jdbc-url: jdbc:log4jdbc:mariadb://127.0.0.1:3306/franc_db1
+      username: ENC(yyjY9eKDq6k4TCAYl4lNnjy9z2XEyINJ)
+      password: ENC(onCZ516SP3kdHEWKoDsd++rqGqCTNjOD)
+
+    maria2:
+      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      jdbc-url: jdbc:log4jdbc:mariadb://127.0.0.1:3306/franc_db2
+      username: ENC(kaFsalHlHg4CcPoagrajMTzE0VFJ7lGy)
+      password: ENC(zUXweTpjgqOJ/SO8njvvckMaRgUtLOYR)
