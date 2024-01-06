@@ -1,5 +1,6 @@
 package com.franc.config.database;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -24,7 +25,10 @@ public class Maria2DataBaseConfig {
     @ConfigurationProperties(prefix="spring.datasource.maria2")
     public DataSource maria2DataSource() {
         //application.properties에서 정의한 DB 연결 정보를 빌드
-        return DataSourceBuilder.create().build();
+        return DataSourceBuilder
+                .create()
+                .type(HikariDataSource.class)
+                .build();
     }
 
     @Bean(name="maria2SessionFactory")

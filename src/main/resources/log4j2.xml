@@ -11,8 +11,8 @@
 
         <!-- 파일  -->
         <RollingFile name ="RollingFile">
-            <FileName>/log/franc_multi_datasource.txt</FileName>
-            <FilePattern>/log/%d{yyyy-MM-dd-hh-mm}/franc_multi_datasource.zip</FilePattern>
+            <FileName>log/franc_multi_datasource.txt</FileName>
+            <FilePattern>log/%d{yyyy-MM-dd-hh-mm}/franc_multi_datasource.zip</FilePattern>
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %5p [%c] %m%n</Pattern>
             </PatternLayout>
@@ -22,8 +22,8 @@
         </RollingFile>
 
         <RollingFile name ="RollingFileError">
-            <FileName>/log/franc_multi_datasource_error.txt</FileName>
-            <FilePattern>/log/%d{yyyy-MM-dd-hh-mm}/franc_multi_datasource_error.zip</FilePattern>
+            <FileName>log/franc_multi_datasource_error.txt</FileName>
+            <FilePattern>log/%d{yyyy-MM-dd-hh-mm}/franc_multi_datasource_error.zip</FilePattern>
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %5p [%c] %m%n</Pattern>
             </PatternLayout>
@@ -34,11 +34,19 @@
 
     </Appenders>
 
+    <!-- 로그 범위 -->
     <loggers>
         <root level="debug" additivity="true">
             <AppenderRef ref="console"/>
             <AppenderRef ref="RollingFile"/>
             <AppenderRef ref="RollingFileError" level = "ERROR"/>
         </root>
+        <!-- DB 관련 로그 설정-->
+        <logger name="jdbc" level="OFF"/>
+        <logger name="jdbc.sqlonly" level="INFO"/>
+        <logger name="jdbc.resultsettable" level="INFO"/>
+        <logger name="jdbc.audit" level="OFF"/>
+        <logger name="jdbc.resultset" level="OFF"/>
+        <logger name="jdbc.connection" level="OFF"/>
     </loggers>
 </Configuration>
