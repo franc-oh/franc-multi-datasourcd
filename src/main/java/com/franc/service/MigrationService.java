@@ -9,13 +9,20 @@ import com.franc.exception.ExceptionResult;
 import com.franc.vo.maria1.ContentVO;
 import com.franc.vo.maria2.ContentFileVO;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +81,7 @@ public class MigrationService {
         return result;
     }
 
+
     /**
      * 데이터 마이그레이션 - DB이관
      * @return result : {"contents_cnt" : int
@@ -90,13 +98,84 @@ public class MigrationService {
 
         // # 1. 데이터 가져오기 (MariaDBs ..)
         Map<String, Object> dataMap = getContensList();
-        List<ContentVO> contents = objectMapper.convertValue(dataMap.get("contents"), new TypeReference<List<ContentVO>>(){}); // TODO : List의 경우 List.class로 변환하면 오류남...
+        List<ContentVO> contents = objectMapper.convertValue(dataMap.get("contents"), new TypeReference<List<ContentVO>>(){});
         List<ContentFileVO> content_files = objectMapper.convertValue(dataMap.get("content_files"), new TypeReference<List<ContentFileVO>>(){});
 
         // # 2. 데이터 등록 (PostgresSQL)
         result = migrationContents(contents, content_files);
 
         logger.info("===== dataMigrationFromDb() Finish : " + result.toString());
+
+        return result;
+    }
+
+
+    /**
+     * 데이터 마이그레이션 - 엑셀이관
+     * @param file
+     * @return result : {"contents_cnt" : int
+     *                  "contents_result_cnt" : int
+     *                  "content_files_cnt" : int
+     *                  "content_file_result_cnt" : int}
+     * @throws Exception
+     */
+    @Transactional
+    public Map<String, Object> dataMigrationFromExcel(MultipartFile file) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+
+        logger.info("===== dataMigrationFromExcel() Start");
+
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+
+        // # 1. 데이터 가져오기 (Excel)
+        Workbook workbook = null;
+
+        if (extension.equals("xlsx")) {
+            workbook = new XSSFWorkbook(file.getInputStream());
+        } else if (extension.equals("xls")) {
+            workbook = new HSSFWorkbook(file.getInputStream());
+        }
+
+
+        List<ContentVO> contents = new ArrayList<>();
+        List<ContentFileVO> content_files = new ArrayList<>();
+
+        Sheet worksheet = workbook.getSheetAt(1); // 제목행 제외
+        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+            Row row = worksheet.getRow(i);
+
+                long content_seq = (long) row.getCell(0).getNumericCellValue();
+                String content_name = row.getCell(1).getStringCellValue();
+                String description = row.getCell(2).getStringCellValue();
+                long file_seq = (long) row.getCell(3).getNumericCellValue();
+                String file_path = row.getCell(4).getStringCellValue();
+                String file_name = row.getCell(5).getStringCellValue();
+                int content_order = (int) row.getCell(3).getNumericCellValue();
+
+                // Excel Cell -> Content
+                ContentVO content = ContentVO.builder()
+                        .content_seq(content_seq)
+                        .name(content_name)
+                        .description(description)
+                        .build();
+                // Excel Cell -> ContentFile
+                ContentFileVO content_file = ContentFileVO.builder()
+                        .file_seq(file_seq)
+                        .content_seq(content_seq)
+                        .file_path(file_path)
+                        .file_name(file_name)
+                        .content_order(content_order)
+                        .build();
+
+                contents.add(content);
+                content_files.add(content_file);
+
+        }
+
+        // # 2. 데이터 등록 (PostgresSQL)
+        result = migrationContents(contents, content_files);
+
+        logger.info("===== dataMigrationFromExcel() Finish : " + result.toString());
 
         return result;
     }
@@ -157,6 +236,7 @@ public class MigrationService {
             }
         } finally {
             sqlSession.flushStatements();
+            sqlSession.commit();
             sqlSession.close();
         }
 
