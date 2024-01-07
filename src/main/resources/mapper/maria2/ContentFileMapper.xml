@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.franc.dao.maria2.ContentFileDao">
+
+    <select id="selectContentFileById" parameterType="Long" resultType="com.franc.vo.maria2.ContentFileVO">
+        /** ContentFileMapper.selectContentFileById */
+        select a.*
+        from content_file a
+        where a.file_seq = #{file_seq}
+    </select>
+
+    <select id="selectContentFileListByContent" resultType="com.franc.vo.maria2.ContentFileVO">
+        /** ContentFileMapper.selectContentFileListByContent */
+        select a.*
+        from content_file a
+        where a.content_seq = #{content_seq}
+        order by a.content_order
+    </select>
+
+</mapper>

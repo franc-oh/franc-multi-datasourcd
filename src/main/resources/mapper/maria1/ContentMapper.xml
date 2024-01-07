@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.franc.dao.maria1.ContentDao">
+
+    <select id="selectContentById" parameterType="Long" resultType="com.franc.vo.maria1.ContentVO">
+        /** ContentMapper.selectContentById */
+        select a.*
+        from content a
+        where a.content_seq = #{content_seq}
+    </select>
+
+    <select id="selectContentList" resultType="com.franc.vo.maria1.ContentVO">
+        /** ContentMapper.selectContentList */
+        select a.*
+        from content a
+    </select>
+
+</mapper>
