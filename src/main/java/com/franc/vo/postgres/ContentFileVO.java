@@ -16,5 +16,6 @@ public class ContentFileVO {
     private String file_path;
     private String file_name;
     private Integer content_order;
+    private Boolean is_valid;
     private LocalDateTime created;
 }

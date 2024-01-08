@@ -15,6 +15,8 @@ public class ContentVO {
     private Long content_seq;
     private String name;
     private String description;
+    @Builder.Default
+    private Character use_yn = 'Y';
     private LocalDateTime created;
 
 }

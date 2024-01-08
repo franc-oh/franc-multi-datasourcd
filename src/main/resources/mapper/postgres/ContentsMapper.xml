@@ -14,15 +14,15 @@
     <insert id="insertContent" parameterType="com.franc.vo.postgres.ContentVO">
         /** ContentMapper.insertContent */
         insert into test.content
-        (content_seq, content_name, description)
-        values (#{content_seq}, #{content_name}, #{description})
+        (content_seq, content_name, description, is_valid)
+        values (#{content_seq}, #{content_name}, #{description}, #{is_valid})
     </insert>
 
     <insert id="insertContentFile" parameterType="com.franc.vo.postgres.ContentFileVO">
         /** ContentMapper.insertContentFile */
         insert into test.content_file
-        (file_seq, content_seq, file_path, file_name, content_order)
-        values (#{file_seq}, #{content_seq}, #{file_path}, #{file_name}, #{content_order})
+        (file_seq, content_seq, file_path, file_name, content_order, is_valid)
+        values (#{file_seq}, #{content_seq}, #{file_path}, #{file_name}, #{content_order}, #{is_valid})
     </insert>
 
 </mapper>

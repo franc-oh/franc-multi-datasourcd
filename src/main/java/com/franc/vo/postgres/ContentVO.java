@@ -13,9 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 public class ContentVO {
     private Long content_seq;
-    @JsonSetter("name")
     private String content_name;
     private String description;
+    private Boolean is_valid;
     private LocalDateTime created;
-
 }

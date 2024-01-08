@@ -6,8 +6,8 @@ import com.franc.dao.maria1.ContentDao;
 import com.franc.dao.maria2.ContentFileDao;
 import com.franc.exception.BizException;
 import com.franc.exception.ExceptionResult;
-import com.franc.vo.maria1.ContentVO;
-import com.franc.vo.maria2.ContentFileVO;
+import com.franc.vo.postgres.ContentVO;
+import com.franc.vo.postgres.ContentFileVO;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.ibatis.session.ExecutorType;
@@ -44,7 +44,7 @@ public class MigrationService {
 
     /**
      * 컨텐츠 + 컨텐츠 파일정보 가져오기
-     * @return result : {content_cnt : int, contents : [ContentVO], content_files : [ContentFileVO]}
+     * @return result : {content_cnt : int, contents : [postgre.ContentVO], content_files : [postgre.ContentFileVO]}
      * @throws Exception
      */
     @Transactional(readOnly = true)
@@ -54,7 +54,7 @@ public class MigrationService {
         logger.info("===== getContensList() Start");
 
         // #1. 컨텐츠 정보 가져오기 => MariaDB#1
-        List<ContentVO> contentList = m1ContentDao.selectContentList();
+        List<ContentVO> contentList = m1ContentDao.selectContentListToPostgreVo();
         if(contentList.isEmpty()) {
             result.put("content_cnt", 0);
             return result;
@@ -66,10 +66,27 @@ public class MigrationService {
 
         // #2. 컨텐츠 파일정보 가져오기 => MariaDB#2 TODO : 성능개선
         List<ContentFileVO> contentFileList = new ArrayList<>();
+        List<Long> contentFileParamList = new ArrayList<>();
+        List<ContentFileVO> fileListByContent = null;
         for(ContentVO content : contentList) {
             long content_seq = content.getContent_seq();
 
-            List<ContentFileVO> fileListByContent = m2ContentDao.selectContentFileListByContent(content_seq);
+            contentFileParamList.add(content_seq);
+
+            // 1000건씩 조회
+            if(contentFileParamList.size() % 1000 == 0) {
+                fileListByContent = m2ContentDao.bulkSelectContentFileListByContentToPostgreVO(contentFileParamList);
+                if(!fileListByContent.isEmpty()) {
+                    contentFileList.addAll(fileListByContent);
+                }
+
+                contentFileParamList.clear(); // paramList 초기화
+            }
+        }
+
+        // 잔여 건 처리
+        if(!contentFileParamList.isEmpty()) {
+            fileListByContent = m2ContentDao.bulkSelectContentFileListByContentToPostgreVO(contentFileParamList);
             if(!fileListByContent.isEmpty()) {
                 contentFileList.addAll(fileListByContent);
             }
@@ -153,6 +170,7 @@ public class MigrationService {
                 int content_order = (int) row.getCell(3).getNumericCellValue();
 
                 // Excel Cell -> Content
+            /*
                 ContentVO content = ContentVO.builder()
                         .content_seq(content_seq)
                         .name(content_name)
@@ -170,6 +188,8 @@ public class MigrationService {
                 contents.add(content);
                 content_files.add(content_file);
 
+             */
+
         }
 
         // # 2. 데이터 등록 (PostgresSQL)
@@ -183,8 +203,8 @@ public class MigrationService {
 
     /**
      * 데이터 이관처리 (INSERT)
-     * @param contents [maria1.ContentVO]
-     * @param content_files [maria2.ContentFileVO]
+     * @param contents [postgres.ContentVO]
+     * @param content_files [postgres.ContentFileVO]
      * @return result : {"contents_cnt" : int
      *                  "contents_result_cnt" : int
      *                  "content_files_cnt" : int

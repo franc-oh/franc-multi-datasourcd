@@ -4,19 +4,31 @@
 
 <mapper namespace="com.franc.dao.maria2.ContentFileDao">
 
-    <select id="selectContentFileById" parameterType="Long" resultType="com.franc.vo.maria2.ContentFileVO">
-        /** ContentFileMapper.selectContentFileById */
-        select a.*
-        from content_file a
-        where a.file_seq = #{file_seq}
-    </select>
+    <sql id="convertPostgresContentFileVO">
+        a.file_seq,
+        a.content_seq,
+        a.file_path,
+        a.file_name,
+        case when a.use_yn = 'Y' then 1 else 0 end as is_valid,
+        a.content_order
 
-    <select id="selectContentFileListByContent" resultType="com.franc.vo.maria2.ContentFileVO">
-        /** ContentFileMapper.selectContentFileListByContent */
-        select a.*
+    </sql>
+
+    <select id="selectContentFileListByContentToPostgreVO" resultType="com.franc.vo.postgres.ContentFileVO">
+        /** ContentFileMapper.selectContentFileListByContentToPostgreVO */
+        select <include refid="convertPostgresContentFileVO" />
         from content_file a
         where a.content_seq = #{content_seq}
-        order by a.content_order
+    </select>
+
+    <select id="bulkSelectContentFileListByContentToPostgreVO" parameterType="java.util.ArrayList" resultType="com.franc.vo.postgres.ContentFileVO">
+        /** ContentFileMapper.bulkSelectContentFileListByContentToPostgreVO */
+        select <include refid="convertPostgresContentFileVO" />
+        from content_file a
+        where a.content_seq in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </select>
 
 </mapper>
