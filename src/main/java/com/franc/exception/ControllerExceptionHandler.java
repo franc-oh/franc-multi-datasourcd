@@ -59,8 +59,8 @@ public class ControllerExceptionHandler {
     // 예외핸들러의 body를 빌드
     public ExceptionResponse buildExceptionResponse(String errorCode, String errorMessage) {
         return new ExceptionResponse().builder()
-                .resultCode(errorCode)
-                .resultMessage(errorMessage)
+                .code(errorCode)
+                .message(errorMessage)
                 .build();
     }
 }
